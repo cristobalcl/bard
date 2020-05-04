@@ -71,7 +71,7 @@ setup(
     ],
     data_files=[('share/doc/packages/bard/',
                  ['config/bard', 'README.md'])],
-    scripts=["scripts/bard"],
+    scripts=["scripts/bard", "scripts/bard_docker.sh"],
     license="GPL-3.0-only AND MIT",
     ext_modules=[bard_ext, bard_audiofile],
     classifiers=[

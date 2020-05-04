@@ -24,9 +24,11 @@ import re
 import werkzeug
 
 
+CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
+
 app = Flask(__name__, static_url_path='/kakaka')
 
-app.jinja_loader = FileSystemLoader('templates')
+app.jinja_loader = FileSystemLoader(os.path.join(CURRENT_PATH, 'templates'))
 CORS(app)
 
 login_manager = LoginManager()
@@ -50,7 +52,7 @@ def read_or_generate_key():
 
     secret_key = os.urandom(16)
 
-    with open(os.open(key_file, os.O_CREAT | os.O_WRONLY, 0o600)) as fh:
+    with open(os.open(key_file, os.O_CREAT | os.O_WRONLY, 0o600), 'w') as fh:
         fh.write('# Private key for web sessions\n')
         fh.write('# If this file is removed, a new key will be generated\n')
         fh.write('key=' + base64.encodebytes(secret_key).decode('utf8') + '\n')
@@ -364,7 +366,7 @@ def hello():
 @app.route('/favicon.ico')
 def serve_favicon():
     filename = 'favicon.ico'
-    localfilename = 'web-root/%s' % filename
+    localfilename = os.path.join(CURRENT_PATH, 'web-root', filename)
     print(localfilename)
     s = open(localfilename, 'rb').read()
     mime = mimetypes.guess_type(localfilename)
@@ -373,7 +375,7 @@ def serve_favicon():
 
 @app.route('/static/<path:filename>')
 def static_file(filename):
-    localfilename = 'web-root/%s' % filename
+    localfilename = os.path.join(CURRENT_PATH, 'web-root', filename)
     print(localfilename)
     s = open(localfilename, 'rb').read()
     mime = mimetypes.guess_type(localfilename)
@@ -412,7 +414,7 @@ def artist_get_image():
     artist_id = request.args.get('id', type=int)
     path = MusicBrainzDatabase.get_artist_image_path(artist_id)
     if not path:
-        path = 'web-root/images/artist.png'
+        path = os.path.join(CURRENT_PATH, 'web-root/images/artist.png')
     print('Delivering artist image of artist %s: %s' % (artist_id, path))
     return send_file(path)
 
@@ -458,7 +460,7 @@ def release_group_get_image():
     release_group_mbid = request.args.get('mbid', type=str)
     dirnames = MusicBrainzDatabase.get_release_group_directories(
         release_group_mbid)
-    path = 'web-root/images/cd.png'
+    path = os.path.join(CURRENT_PATH, 'web-root/images/cd.png')
     for dirname in dirnames:
         cover = os.path.join(dirname, 'cover.jpg')
         if os.path.exists(cover):
@@ -512,7 +514,7 @@ def release_group_releases():
 def release_get_image():
     release_mbid = request.args.get('mbid', type=str)
     dirnames = MusicBrainzDatabase.get_release_directories(release_mbid)
-    path = 'web-root/images/cd.png'
+    path = os.path.join(CURRENT_PATH, 'web-root/images/cd.png')
     for dirname in dirnames:
         cover = os.path.join(dirname, 'cover.jpg')
         if os.path.exists(cover):

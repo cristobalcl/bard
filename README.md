@@ -82,6 +82,23 @@ the same songs, but the ones in directory1 are encoded in mp3 128kbps while the 
 Note that bard will never remove files. If you find duplicated files, you can remove them and then run ```bard update``` to
 let bard know that some files no longer exist.
 
+# Using Docker
+
+Build Docker image:
+
+```docker build -t bard .```
+
+Run web backend:
+
+```
+docker run -it --rm --name bard --publish 5000:5000 \
+  --env BARD_DB_PATH="/db/music.db" \
+  --env BARD_MUSIC_PATH="/music" \
+  -v $HOME/.config/bard/db:/db/ \
+  -v $HOME/Music:/music \
+  -v $HOME/.local/share/bard:/root/.local/share/bard \
+  bard
+```
 
 # License
 
